@@ -13,9 +13,12 @@ namespace DailyProgrammer248.Net
     {
         static void Main(string[] args)
         {
-            var file = new PpmFile(2, 2, 255);
+            using (var ppmGen = new PpmDrawingReader(new StreamReader(new FileStream(@"../../../Challenge Input.txt", FileMode.Open))))
+            {
+                var result = ppmGen.Process();
+                Console.WriteLine(result.GenerateFile());
+            }
 
-            Console.WriteLine(file.GenerateFile());
             Console.ReadKey();
         }
     }
@@ -81,10 +84,13 @@ namespace DailyProgrammer248.Net
             while (!_drawingCommands.EndOfStream)
             {
                 var line = _drawingCommands.ReadLine();
-                var split = line.Split(' ');
-                var command = split[0];
-
+                var pointGen = new PointGenerator(line);
+                foreach (var colorPoint in pointGen.Generate())
+                {
+                    ppm[colorPoint.P.Y, colorPoint.P.X] = colorPoint.C;
+                }
             }
+            return ppm;
         }
 
         private PpmFile InitPpmFromStream(StreamReader drawingCommands)
@@ -107,7 +113,7 @@ namespace DailyProgrammer248.Net
         private readonly string[] _split;
         private readonly Color _color;
 
-        protected PointGenerator(string line)
+        public PointGenerator(string line)
         {
             _split = line.Split(' ');
             _command = _split[0];
@@ -133,12 +139,25 @@ namespace DailyProgrammer248.Net
         {
             var from = new Point(int.Parse(_split[4]), int.Parse(_split[5]));
             var to = new Point(int.Parse(_split[6]), int.Parse(_split[7]));
-            var result = new List<ColorPoint>();
-            var run = from.X - to.X;
-            var rise = from.Y - to.Y;
-            var slope = rise / (double)run;
+            return RecursiveLine(from, to, _color);
+        }
 
+        private static List<ColorPoint> RecursiveLine(Point from, Point to, Color color)
+        {
+            if (from.X == to.X && from.Y == to.Y)
+            {
+                return new List<ColorPoint>
+                {
+                    new ColorPoint
+                    {
+                        P = from,
+                        C = color,
+                    }
+                };
+            }
 
+            var midPoint = Midpoint(from, to);
+            return RecursiveLine(from, midPoint, color).Union(RecursiveLine(midPoint, to, color)).ToList();
         }
 
         private List<ColorPoint> GenerateRect()
@@ -169,6 +188,11 @@ namespace DailyProgrammer248.Net
                     C = _color,
                 }))
                 .ToList();
+        }
+
+        private static Point Midpoint(Point p1, Point p2)
+        {
+            return new Point((int)Math.Round((p1.X + p2.X) / 2.0), (int)Math.Round((p1.Y + p2.Y) / 2.0));
         }
 
         private List<ColorPoint> GeneratePoint()
