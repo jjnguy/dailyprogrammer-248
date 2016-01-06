@@ -4,7 +4,12 @@
   <title>Daily Programmer #248 [Easy]</title>
 </head>
 <body>
-  <textarea placeholder="instructions" id="instructions"></textarea>
+  <textarea placeholder="instructions" id="instructions">400 300
+rect 0 0 255 0 0 300 400
+line 255 255 255 0 0 299 399
+line 255 255 255 299 0 0 399
+rect 200 200 0 100 150 100 100
+point 0 0 0 150 200</textarea>
   <button type="submit" onclick="runInstructions()">run</button>
   <textarea placeholder="output" id="output"></textarea>
 </body>
@@ -17,29 +22,84 @@
   function processInstructions(instructions){
     var lines = instructions.split('\n');
     var widthHeight = lines[0];
-
+    var splitWidthHeight = widthHeight.split(' ');
+    var width = parseInt(splitWidthHeight[0]);
+    var height = parseInt(splitWidthHeight[1]);
     var result = 'P3 ' + widthHeight + ' 255 ';
 
-    var points = {};
+    var pointsToDraw = [];
 
     for (var i = 1; i < lines.length; i++) {
       var instruction = lines[i];
       var split = instruction.split(' ');
       var command = split[0];
       var color = '  ' + split[1] + ' ' + split[2] + ' ' + split[3] + '  ';
+      switch (command) {
+        case 'point':
+          pointsToDraw = pointsToDraw.concat(getPointPoints(color, split));
+          break;
+        case 'line':
+          pointsToDraw = pointsToDraw.concat(getLinePoints(color, split));
+          break;
+        case 'rect':
+          pointsToDraw = pointsToDraw.concat(getRectPoints(color, split));
+          break;
+        default:
+          throw 'Illegal command: ' + command;
+      }
+    }
+    var allPoints = new Array(width * height).fill('  0 0 0  ', 0, width * height);
+    pointsToDraw.forEach(function(point){
+      var idx = point.y * width + point.x;
+      allPoints[idx] = point.color;
+    });
 
+    allPoints.forEach(function (point){
+      result += point;
+    });
+
+    return result;
+  }
+
+  function getPointPoints(color, split){
+    return [{
+      color: color,
+      x: parseInt(split[5]),
+      y: parseInt(split[4])
+    }];
+  }
+  function getLinePoints(color, split){
+    return [];
+  }
+  function getRectPoints(color, split){
+    var topLeft = {
+      x: parseInt(split[5]),
+      y: parseInt(split[4])
+    };
+    var height = parseInt(split[6]);
+    var width = parseInt(split[7]);
+
+    var result = [];
+    for (var x = 0; x < width; x++) {
+      for (var y = 0; y < height; y++) {
+        result.push({
+          color: color,
+          x: topLeft.x + x,
+          y: topLeft.y + y
+        });
+      }
     }
     return result;
   }
 
-  function getPointPoints(){
-    return [];
-  }
-  function getLinePoints(){
-    return [];
-  }
-  function getRectPoints(){
-    return [];
+  function applyPointsToMaster(master, newPoints){
+    for (var i = 0; i < newPoints.length; i++) {
+      var point = newPoints[i];
+      if (!master[point.x]){
+        master[point.x] = [];
+      }
+      master[point.x][point.y] = point.color;
+    }
   }
 </script>
 </html>
