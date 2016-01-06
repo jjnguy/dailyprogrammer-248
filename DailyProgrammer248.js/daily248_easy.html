@@ -11,12 +11,42 @@ line 255 255 255 299 0 0 399
 rect 200 200 0 100 150 100 100
 point 0 0 0 150 200</textarea>
   <button type="submit" onclick="runInstructions()">run</button>
-  <textarea placeholder="output" id="output"></textarea>
+  <textarea style="display: none;" placeholder="output" id="output"></textarea>
+  <canvas id="canvas"></canvas>
 </body>
 <script>
   function runInstructions(){
     var rawInstructions = document.getElementById('instructions').value;
-    document.getElementById('output').value = processInstructions(rawInstructions);
+    var ppm = processInstructions(rawInstructions);
+    drawPpmOnCanvas(ppm, document.getElementById('canvas'));
+  }
+
+  function drawPpmOnCanvas(ppm, canvas){
+    var ctx = canvas.getContext('2d');
+
+    var splitPpm = ppm.split(/\s+/);
+    var version = splitPpm[0];
+    var width = parseInt(splitPpm[1]);
+    var height = parseInt(splitPpm[2]);
+    var maxColor = splitPpm[3];
+
+    canvas.height = height;
+    canvas.width = width;
+
+    var imageData = ctx.createImageData(width, height);
+    var data = imageData.data;
+
+    var headerOffset = 4
+
+    for(var i = 0; i < (width * height); i++){
+      var dataIx = i * 4;
+      var splitIx = i * 3;
+      data[dataIx + 0] = parseInt(splitPpm[splitIx + headerOffset + 0]);
+      data[dataIx + 1] = parseInt(splitPpm[splitIx + headerOffset + 1]);
+      data[dataIx + 2] = parseInt(splitPpm[splitIx + headerOffset + 2]);
+      data[dataIx + 3] = 255;
+    }
+    ctx.putImageData(imageData, 0, 0)
   }
 
   function processInstructions(instructions){
