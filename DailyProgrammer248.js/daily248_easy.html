@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+  <title>Daily Programmer #248 [Easy]</title>
+</head>
+<body>
+  <textarea placeholder="instructions" id="instructions"></textarea>
+  <button type="submit" onclick="runInstructions()">run</button>
+  <textarea placeholder="output" id="output"></textarea>
+</body>
+<script>
+  function runInstructions(){
+    var rawInstructions = document.getElementById('instructions').value;
+    document.getElementById('output').value = processInstructions(rawInstructions);
+  }
+
+  function processInstructions(instructions){
+    var lines = instructions.split('\n');
+    var widthHeight = lines[0];
+
+    var result = 'P3 ' + widthHeight + ' 255 ';
+
+    var points = {};
+
+    for (var i = 1; i < lines.length; i++) {
+      var instruction = lines[i];
+      var split = instruction.split(' ');
+      var command = split[0];
+      var color = '  ' + split[1] + ' ' + split[2] + ' ' + split[3] + '  ';
+
+    }
+    return result;
+  }
+
+  function getPointPoints(){
+    return [];
+  }
+  function getLinePoints(){
+    return [];
+  }
+  function getRectPoints(){
+    return [];
+  }
+</script>
+</html>
