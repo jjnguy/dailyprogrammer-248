@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DailyProgrammer248.Net", "DailyProgrammer248.Net\DailyProgrammer248.Net.csproj", "{345BF58C-BDF3-47E5-85D1-65CABC2DC31E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DailyProgrammer248_Easy.Net", "DailyProgrammer248.Net\DailyProgrammer248_Easy.Net.csproj", "{345BF58C-BDF3-47E5-85D1-65CABC2DC31E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "input files", "input files", "{775B30BC-3070-46BC-B108-DCDC3513C41E}"
 	ProjectSection(SolutionItems) = preProject
