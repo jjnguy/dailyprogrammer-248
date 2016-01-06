@@ -69,8 +69,46 @@ point 0 0 0 150 200</textarea>
     }];
   }
   function getLinePoints(color, split){
-    return [];
+    var from = {
+      x: parseInt(split[5]),
+      y: parseInt(split[4])
+    };
+    var to = {
+      x: parseInt(split[7]),
+      y: parseInt(split[6])
+    };
+    return _recursiveLine(from, to, color);
   }
+  function _pointEqual(p1, p2){
+    return p1.x == p2.x && p1.y == p2.y;
+  }
+  function _recursiveLine(from, to, color){
+    if (_pointEqual(from, to)){
+      return [{
+        color: color,
+        x: from.x,
+        y: from.y
+      }];
+    }
+
+    var midpoint = _midpoint(from, to);
+    if (_pointEqual(midpoint, from) || _pointEqual(midpoint, to)){
+      return [{
+        color: color,
+        x: midpoint.x,
+        y: midpoint.y
+      }]
+    }
+
+    return _recursiveLine(from, midpoint, color).concat(_recursiveLine(midpoint, to, color));
+  }
+  function _midpoint(p1, p2){
+    return {
+      x : Math.floor((p1.x+p2.x) / 2),
+      y : Math.floor((p1.y+p2.y) / 2)
+    };
+  }
+
   function getRectPoints(color, split){
     var topLeft = {
       x: parseInt(split[5]),
