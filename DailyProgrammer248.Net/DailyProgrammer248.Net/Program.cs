@@ -13,11 +13,11 @@ namespace DailyProgrammer248.Net
     {
         static void Main(string[] args)
         {
-            using (var ppmGen = new PpmDrawingReader(new StreamReader(new FileStream(@"../../../Challenge Input.txt", FileMode.Open))))
+            using (var ppmGen = new PpmDrawingReader(new StreamReader(new FileStream(@"../../../Big Challenge.txt", FileMode.Open))))
             {
                 var result = ppmGen.Process();
                 var file = (result.GenerateFile());
-                File.WriteAllText("result3.ppm", file);
+                File.WriteAllText("big.ppm", file);
             }
         }
     }
@@ -26,15 +26,13 @@ namespace DailyProgrammer248.Net
     {
         public readonly int Width;
         public readonly int Height;
-        public readonly int MaxColor;
 
         public readonly List<Color> Points;
 
-        public PpmFile(int width, int height, int maxColor)
+        public PpmFile(int width, int height)
         {
             Width = width;
             Height = height;
-            MaxColor = maxColor;
             var black = Color.Black;
             Points = Enumerable.Range(0, width * height).Select(num => black).ToList();
         }
@@ -50,6 +48,7 @@ namespace DailyProgrammer248.Net
             var result = new StringBuilder();
             result.AppendLine("P3");
             result.AppendLine($"{Width} {Height}");
+            result.AppendLine("255");
             foreach (var point in Points)
             {
                 result.Append(ColorToPpmPixl(point));
@@ -96,7 +95,7 @@ namespace DailyProgrammer248.Net
         {
             var firstLine = drawingCommands.ReadLine();
             var split = firstLine.Split(' ');
-            return new PpmFile(int.Parse(split[0]), int.Parse(split[1]), 255);
+            return new PpmFile(int.Parse(split[0]), int.Parse(split[1]));
         }
 
         public void Dispose()
@@ -116,7 +115,7 @@ namespace DailyProgrammer248.Net
         {
             _split = line.Split(' ');
             _command = _split[0];
-            _color = ParseColor(_split);
+            _color = Color.FromArgb(0, int.Parse(_split[1]), int.Parse(_split[2]), int.Parse(_split[3]));
         }
 
         public List<ColorPoint> Generate()
@@ -170,7 +169,6 @@ namespace DailyProgrammer248.Net
                     }
                 };
             }
-
             return RecursiveLine(from, midPoint, color).Union(RecursiveLine(midPoint, to, color)).ToList();
         }
 
@@ -180,33 +178,29 @@ namespace DailyProgrammer248.Net
             var height = int.Parse(_split[6]);
             var width = int.Parse(_split[7]);
 
-            return
-                Enumerable.Range(topLeft.X, width).Select(x => new ColorPoint
+            var result = new List<ColorPoint>(height * width);
+
+            for (var x = 0; x < width; x++)
+            {
+                for (var y = 0; y < height; y++)
                 {
-                    P = new Point(x, topLeft.Y),
-                    C = _color,
-                })
-                .Union(Enumerable.Range(topLeft.X, width).Select(x => new ColorPoint
-                {
-                    P = new Point(x, topLeft.Y + height - 1),
-                    C = _color,
-                }))
-                .Union(Enumerable.Range(topLeft.Y, height).Select(y => new ColorPoint
-                {
-                    P = new Point(topLeft.X, y),
-                    C = _color,
-                }))
-                .Union(Enumerable.Range(topLeft.Y, height).Select(y => new ColorPoint
-                {
-                    P = new Point(topLeft.X + width - 1, y),
-                    C = _color,
-                }))
-                .ToList();
+                    result.Add(new ColorPoint
+                    {
+                        C = _color,
+                        P = new Point
+                        {
+                            X = topLeft.X + x,
+                            Y = topLeft.Y + y,
+                        }
+                    });
+                }
+            }
+            return result;
         }
 
         private static Point Midpoint(Point p1, Point p2)
         {
-            return new Point((int)Math.Round((p1.X + p2.X) / 2.0), (int)Math.Round((p1.Y + p2.Y) / 2.0));
+            return new Point((int)((p1.X + p2.X) / 2.0), (int)((p1.Y + p2.Y) / 2.0));
         }
 
         private List<ColorPoint> GeneratePoint()
@@ -219,11 +213,6 @@ namespace DailyProgrammer248.Net
                     P = new Point(int.Parse(_split[5]), int.Parse(_split[4])),
                 }
             };
-        }
-
-        private Color ParseColor(string[] parts)
-        {
-            return Color.FromArgb(0, int.Parse(_split[1]), int.Parse(_split[2]), int.Parse(_split[3]));
         }
     }
 
